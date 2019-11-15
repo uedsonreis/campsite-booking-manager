@@ -4,7 +4,7 @@ public class Result {
 
 	private Object data;
 	private String message;
-	private Boolean success = true;
+	private Boolean success = false;
 	
 	public Object getData() {
 		return data;

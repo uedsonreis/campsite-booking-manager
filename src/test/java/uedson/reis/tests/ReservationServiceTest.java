@@ -1,5 +1,7 @@
 package uedson.reis.tests;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -99,7 +101,7 @@ public class ReservationServiceTest {
 			String url = "/booking?email=edwardreyes@anymail.com&name=Edward Reyes&arrival="+arrival+"&departure="+departure;
 			
 			try {
-				this.mockMvc.perform(get(url))
+				this.mockMvc.perform(post(url))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("success").value(false));
@@ -186,7 +188,7 @@ public class ReservationServiceTest {
 		
 		String url = "/booking?email="+email+"&name="+name+"&arrival="+arrival+"&departure="+departure;
 		
-		ResultActions result = this.mockMvc.perform(get(url))
+		ResultActions result = this.mockMvc.perform(post(url))
 			.andDo(print())
 			.andExpect(status().isOk());
 		
@@ -204,7 +206,7 @@ public class ReservationServiceTest {
 		String arrivalTxt = DateUtil.FORMATTER.format(arrival);
 		String departureTxt = DateUtil.FORMATTER.format(departure);
 		
-		String url = "/change?id="+id+"&&arrival="+arrivalTxt+"&departure="+departureTxt;
+		String url = "/change/"+id+"/reservation?arrival="+arrivalTxt+"&departure="+departureTxt;
 		
 		this.mockMvc.perform(get(url))
 			.andDo(print())
@@ -212,7 +214,7 @@ public class ReservationServiceTest {
 	}
 	
 	private void testCancel(long id) throws Exception {
-		this.mockMvc.perform(get("/cancel?id="+id))
+		this.mockMvc.perform(delete("/cancel/"+id+"/reservation"))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true));

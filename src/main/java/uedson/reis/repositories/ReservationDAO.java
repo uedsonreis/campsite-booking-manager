@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +20,6 @@ public class ReservationDAO {
 	
 	@Autowired
 	private ReservationRepository reservationRepository;
-	
-	@Autowired
-	private EntityManager entityManager;
 	
 	@Transactional
 	public Reservation save(Reservation reservation) {
@@ -70,16 +65,7 @@ public class ReservationDAO {
 	}
 	
 	public List<Reservation> findByRange(Date initialDate, Date finalDate) {
-
-		String query = "SELECT r FROM Reservation r WHERE (?1 <= r.arrival AND r.departure <= ?2) OR "
-				+ "((r.arrival <= ?1 AND ?1 < r.departure) OR (r.arrival < ?2 AND ?2 <= r.departure))"
-				+ "order by r.arrival";
-		
-		TypedQuery<Reservation> typedQuery = this.entityManager.createQuery(query, Reservation.class);
-		typedQuery.setParameter(1, initialDate);
-		typedQuery.setParameter(2, finalDate);
-		
-		return typedQuery.getResultList();
+		return this.reservationRepository.find(initialDate, finalDate);
 	}
 	
 	@Transactional
