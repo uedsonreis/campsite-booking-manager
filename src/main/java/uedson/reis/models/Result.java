@@ -4,7 +4,6 @@ public class Result {
 
 	private Object data;
 	private String message;
-	private Boolean success = false;
 	
 	public Object getData() {
 		return data;
@@ -20,15 +19,9 @@ public class Result {
 		this.message = message;
 	}
 
-	public Boolean getSuccess() {
-		return success;
-	}
-	public void setSuccess(Boolean success) {
-		this.success = success;
-	}
-	
 	@Override
 	public String toString() {
-		return "ReturnType [data=" + data + ", success=" + success + ", message=" + message + "]";
+		return "ReturnType [data=" + data + ", message=" + message + "]";
 	}
+
 }

@@ -1,16 +1,16 @@
 package uedson.reis.tests;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -54,6 +54,7 @@ public class ReservationServiceTest {
 	
 	@BeforeAll
 	public void prepareDatabase() {
+		
 		User user = new User();
 		user.setEmail("uedsonreis@gmail.com");
 		user.setName("Uedson Reis");
@@ -103,8 +104,7 @@ public class ReservationServiceTest {
 			try {
 				this.mockMvc.perform(post(url))
 				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("success").value(false));
+				.andExpect(status().isConflict());
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -146,8 +146,7 @@ public class ReservationServiceTest {
 		try {
 			this.mockMvc.perform(get("/availability"))
 				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("success").value(true));
+				.andExpect(status().isOk());
 						
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -189,15 +188,12 @@ public class ReservationServiceTest {
 		String url = "/booking?email="+email+"&name="+name+"&arrival="+arrival+"&departure="+departure;
 		
 		ResultActions result = this.mockMvc.perform(post(url))
-			.andDo(print())
-			.andExpect(status().isOk());
-		
-		Object data = new JSONObject(result.andReturn().getResponse().getContentAsString()).get("data");
+			.andDo(print());
 		
 		try {
-			return Long.parseLong(data+"");
-
-		} catch(NumberFormatException nfe) {
+			Object id = new JSONObject(result.andReturn().getResponse().getContentAsString());
+			return Long.parseLong(id+"");
+		} catch (JSONException je) {
 			return null;
 		}
 	}
@@ -216,8 +212,21 @@ public class ReservationServiceTest {
 	private void testCancel(long id) throws Exception {
 		this.mockMvc.perform(delete("/cancel/"+id+"/reservation"))
 			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("success").value(true));
+			.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void testNotCancel() {
+		try {
+			ResultActions result = this.mockMvc.perform(delete("/cancel/3333/reservation"))
+				.andDo(print())
+				.andExpect(status().isBadRequest());
+			
+			System.err.println("Aqui oh 1: "+ result.andReturn().getResponse().getContentAsString() );
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
